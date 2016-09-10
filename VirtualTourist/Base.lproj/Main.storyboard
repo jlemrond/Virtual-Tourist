@@ -37,23 +37,44 @@
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="ZH6-uU-oY4">
                                 <rect key="frame" x="0.0" y="64" width="600" height="536"/>
                             </mapView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gMr-Fs-cmu">
+                                <rect key="frame" x="20" y="536" width="560" height="44"/>
+                                <subviews>
+                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="SELECT PINS TO DELETE" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="c18-yP-uJN">
+                                        <rect key="frame" x="195.5" y="13.5" width="169" height="17"/>
+                                        <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <textInputTraits key="textInputTraits"/>
+                                    </textField>
+                                </subviews>
+                                <color key="backgroundColor" red="0.86274509799999999" green="0.34905338959591264" blue="0.35583708044768281" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstItem="c18-yP-uJN" firstAttribute="centerX" secondItem="gMr-Fs-cmu" secondAttribute="centerX" id="025-nD-DJs"/>
+                                    <constraint firstAttribute="height" constant="44" id="Hto-us-YRR"/>
+                                    <constraint firstItem="c18-yP-uJN" firstAttribute="centerY" secondItem="gMr-Fs-cmu" secondAttribute="centerY" id="ke4-dh-pVT"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="ZH6-uU-oY4" secondAttribute="bottom" id="3BY-O9-Htg"/>
                             <constraint firstAttribute="trailingMargin" secondItem="ZH6-uU-oY4" secondAttribute="trailing" constant="-20" id="9WB-nq-3X3"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="gMr-Fs-cmu" secondAttribute="trailing" id="DPM-oE-2gY"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="gMr-Fs-cmu" secondAttribute="bottom" constant="20" id="HPF-nL-Hv5"/>
+                            <constraint firstItem="gMr-Fs-cmu" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="c6g-Zc-bPe"/>
                             <constraint firstItem="ZH6-uU-oY4" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="fFP-3N-D7Q"/>
                             <constraint firstItem="ZH6-uU-oY4" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-20" id="vhd-iC-ZQ3"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="mGA-P4-965">
-                        <barButtonItem key="rightBarButtonItem" systemItem="edit" id="3yh-Ub-Vqu">
+                        <barButtonItem key="rightBarButtonItem" title="Edit" id="3yh-Ub-Vqu">
                             <connections>
-                                <action selector="editPins" destination="BYZ-38-t0r" id="u6i-QP-Py4"/>
+                                <action selector="editPins:" destination="BYZ-38-t0r" id="wtA-WA-muK"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
                     <connections>
+                        <outlet property="deleteStateView" destination="gMr-Fs-cmu" id="yTU-lV-0li"/>
                         <outlet property="editButton" destination="3yh-Ub-Vqu" id="Gno-E4-xIZ"/>
                         <outlet property="mapView" destination="ZH6-uU-oY4" id="s1B-RM-VK3"/>
                     </connections>

@@ -11,8 +11,20 @@ import MapKit
 
 class MapViewController: UIViewController {
 
+    // ******************************************************
+    //   MARK: - Variables
+    // ******************************************************
+
     @IBOutlet var mapView: MKMapView!
     @IBOutlet var editButton: UIBarButtonItem!
+    @IBOutlet var deleteStateView: UIView!
+
+    var editable = false
+
+
+    // ******************************************************
+    //   MARK: - Load/Appear Functions
+    // ******************************************************
 
     override func viewDidLoad() {
         print("Map View Loaded")
@@ -22,25 +34,62 @@ class MapViewController: UIViewController {
         let longPressOnMap = UILongPressGestureRecognizer(target: self, action: #selector(addPin))
         mapView.addGestureRecognizer(longPressOnMap)
 
+        editButton.title = "Edit"
+        deleteStateView.hidden = !editable
+
     }
 
-    @IBAction func editPins() {
-        print("Edit Pins Selected")
+    // ******************************************************
+    //   MARK: - Button Actions
+    // ******************************************************
+
+    /// Enter Edit Pin Mode.
+    @IBAction func editPins(sender: UIBarButtonItem) {
+        editable = !editable
+
+        for annotation in mapView.selectedAnnotations {
+            mapView.deselectAnnotation(annotation, animated: true)
+        }
+
+        if editable == true {
+            editButton.title = "Done"
+        } else {
+            editButton.title = "Edit"
+        }
+
+        deleteStateView.hidden = !editable
     }
 
+
+    // ******************************************************
+    //   MARK: - Functions
+    // ******************************************************
+
+    /// Adds a pin to the Map View.
     func addPin(gestureRecognizer: UIGestureRecognizer) {
 
         if gestureRecognizer.state == UIGestureRecognizerState.Began {
+
+            guard editable == false else {
+                displayOneButtonAlert("Oops", message: "Please exit edit mode to add new pins")
+                return
+            }
+
             print("Adding Pin to Map")
 
-            // Convert Point of Touch to Coordinates.
-            let touchPoint = gestureRecognizer.locationInView(mapView)
-            let pinCoordinates = mapView.convertPoint(touchPoint, toCoordinateFromView: mapView)
+            performHighPriority(action: { 
+                let touchPoint = gestureRecognizer.locationInView(self.mapView)
+                let pinCoordinates = self.mapView.convertPoint(touchPoint, toCoordinateFromView: self.mapView)
 
-            // Create Annotation
-            let annotation = MKPointAnnotation()
-            annotation.coordinate = pinCoordinates
-            mapView.addAnnotation(annotation)
+                // Create Annotation
+                let annotation = MKPointAnnotation()
+                annotation.coordinate = pinCoordinates
+                performOnMain({ 
+                    self.mapView.addAnnotation(annotation)
+                })
+            })
+
+            // TODO: Begin downloading data.
 
         }
 
@@ -48,9 +97,25 @@ class MapViewController: UIViewController {
 
 }
 
+
+
+
+// ******************************************************
+//   MARK: - Map View Delegate
+// ******************************************************
+
+
 extension MapViewController: MKMapViewDelegate {
 
+    func mapView(mapView: MKMapView, didSelectAnnotationView view: MKAnnotationView) {
+        print("Pin Selected")
 
+        if editable == true {
+            performOnMain({ 
+                self.mapView.removeAnnotation(view.annotation!)
+            })
+        }
+    }
 
 
 }
