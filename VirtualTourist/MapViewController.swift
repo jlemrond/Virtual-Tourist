@@ -17,11 +17,39 @@ class MapViewController: UIViewController {
     override func viewDidLoad() {
         print("Map View Loaded")
 
+        mapView.delegate = self
+
+        let longPressOnMap = UILongPressGestureRecognizer(target: self, action: #selector(addPin))
+        mapView.addGestureRecognizer(longPressOnMap)
+
     }
 
     @IBAction func editPins() {
         print("Edit Pins Selected")
     }
+
+    func addPin(gestureRecognizer: UIGestureRecognizer) {
+
+        if gestureRecognizer.state == UIGestureRecognizerState.Began {
+            print("Adding Pin to Map")
+
+            // Convert Point of Touch to Coordinates.
+            let touchPoint = gestureRecognizer.locationInView(mapView)
+            let pinCoordinates = mapView.convertPoint(touchPoint, toCoordinateFromView: mapView)
+
+            // Create Annotation
+            let annotation = MKPointAnnotation()
+            annotation.coordinate = pinCoordinates
+            mapView.addAnnotation(annotation)
+
+        }
+
+    }
+
+}
+
+extension MapViewController: MKMapViewDelegate {
+
 
 
 
