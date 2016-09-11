@@ -8,6 +8,7 @@
 
 import UIKit
 import MapKit
+import CoreData
 
 class MapViewController: UIViewController {
 
@@ -20,6 +21,7 @@ class MapViewController: UIViewController {
     @IBOutlet var deleteStateView: UIView!
 
     var editable = false
+
 
 
     // ******************************************************
@@ -99,8 +101,6 @@ class MapViewController: UIViewController {
                         return
                     }
 
-
-
                 })
 
             })
@@ -133,4 +133,10 @@ extension MapViewController: MKMapViewDelegate {
 
 
 }
+
+
+
+
+
+
 

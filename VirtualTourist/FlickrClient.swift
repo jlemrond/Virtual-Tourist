@@ -25,6 +25,7 @@ class FlickrClient: Networkable {
     //   MARK: - Functions
     // ******************************************************
 
+    /// Get Photos from Flickr when a pin is dropped.
     func getPhotosFromCoordinates(longitude longitude: String, latitude: String, completionHandler: (result: AnyObject?, error: String?) -> Void) {
 
         let url = buildFlickrAPIURL(longitude: longitude, latitude: latitude)

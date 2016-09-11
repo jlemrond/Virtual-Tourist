@@ -16,6 +16,7 @@
 		EA221F951D84A3CB0098E4D4 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA221F941D84A3CB0098E4D4 /* Utilities.swift */; };
 		EA221F9A1D84F6C50098E4D4 /* FlickrClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA221F991D84F6C50098E4D4 /* FlickrClient.swift */; };
 		EA221F9C1D84FCA90098E4D4 /* Networkable.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA221F9B1D84FCA90098E4D4 /* Networkable.swift */; };
+		EA221FA11D85210B0098E4D4 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = EA221F9F1D85210B0098E4D4 /* Model.xcdatamodeld */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 		EA221F941D84A3CB0098E4D4 /* Utilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Utilities.swift; path = ../Utilities.swift; sourceTree = "<group>"; };
 		EA221F991D84F6C50098E4D4 /* FlickrClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlickrClient.swift; sourceTree = "<group>"; };
 		EA221F9B1D84FCA90098E4D4 /* Networkable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Networkable.swift; sourceTree = "<group>"; };
+		EA221FA01D85210B0098E4D4 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -85,6 +87,7 @@
 		EA221F961D84A6070098E4D4 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				EA221F9F1D85210B0098E4D4 /* Model.xcdatamodeld */,
 				EA221F991D84F6C50098E4D4 /* FlickrClient.swift */,
 				EA221F9B1D84FCA90098E4D4 /* Networkable.swift */,
 				EA221F921D848BDE0098E4D4 /* CoreDataStack.swift */,
@@ -182,6 +185,7 @@
 				EA221F931D848BDE0098E4D4 /* CoreDataStack.swift in Sources */,
 				EA221F9A1D84F6C50098E4D4 /* FlickrClient.swift in Sources */,
 				EA221F821D848BA00098E4D4 /* MapViewController.swift in Sources */,
+				EA221FA11D85210B0098E4D4 /* Model.xcdatamodeld in Sources */,
 				EA221F951D84A3CB0098E4D4 /* Utilities.swift in Sources */,
 				EA221F9C1D84FCA90098E4D4 /* Networkable.swift in Sources */,
 				EA221F801D848BA00098E4D4 /* AppDelegate.swift in Sources */,
@@ -336,6 +340,19 @@
 			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		EA221F9F1D85210B0098E4D4 /* Model.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				EA221FA01D85210B0098E4D4 /* Model.xcdatamodel */,
+			);
+			currentVersion = EA221FA01D85210B0098E4D4 /* Model.xcdatamodel */;
+			path = Model.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = EA221F741D848BA00098E4D4 /* Project object */;
 }
