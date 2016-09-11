@@ -22,11 +22,20 @@ class Pin: NSManagedObject {
         }
 
         self.init(entity: entity, insertIntoManagedObjectContext: context)
-        id = NSNumber(unsignedInt: arc4random_uniform(UInt32(INT32_MAX)))
+        self.id = NSNumber(unsignedInt: arc4random_uniform(UInt32(INT32_MAX)))
         longitude = NSNumber(double: coordinates.longitude)
         latitude = NSNumber(double: coordinates.latitude)
         createDate = NSDate()
 
+    }
+
+    var coordinates: CLLocationCoordinate2D {
+        guard let latitude = latitude,
+            let longitude = longitude else {
+                return CLLocationCoordinate2D(latitude: 0, longitude: 0)
+        }
+
+        return CLLocationCoordinate2D(latitude: Double(latitude), longitude: Double(longitude))
     }
 
 }

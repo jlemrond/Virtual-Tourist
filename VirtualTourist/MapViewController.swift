@@ -95,69 +95,23 @@ class MapViewController: UIViewController {
                 let touchPoint = gestureRecognizer.locationInView(self.mapView)
                 let pinCoordinates = self.mapView.convertPoint(touchPoint, toCoordinateFromView: self.mapView)
 
-                // Create Annotation.
-                let annotation = MKPointAnnotation()
-                annotation.coordinate = pinCoordinates
-                print("New Pin Coord: \(pinCoordinates)")
-                performOnMain({ 
-                    self.mapView.addAnnotation(annotation)
-                })
-
                 // Create Pin in Background Context for Data Model.
                 var newPin: Pin!
                 self.stack.performBackgroundBatchOperation({ (context) in
                     newPin = Pin(coordinates: pinCoordinates, context: context)
                     print("Added pin with id: \(newPin?.id)")
-                })
 
-                // Get Data for Annotation
-                FlickrClient.sharedInstance.getPhotosFromCoordinates(longitude: String(pinCoordinates.longitude), latitude: String(pinCoordinates.latitude), completionHandler: { (result, error) in
+                    // Create Annotation.
+                    let annotation = TravelLocationPointAnnotation(pin: newPin)
+                    annotation.coordinate = pinCoordinates
+                    print("New Pin Coord: \(pinCoordinates)")
+                    performOnMain({
+                        self.mapView.addAnnotation(annotation)
+                    })
 
-                    guard error == nil else {
-                        self.displayOneButtonAlert("Alert", message: error)
-                        return
-                    }
-
-                    guard let photoArray = result as? [[String: AnyObject]] else {
-                        self.displayOneButtonAlert("Oops", message: "Something went wrong here.")
-                        return
-                    }
-
-                    for (index, value) in photoArray.enumerate() {
-
-                        guard let id = value["id"] as? String else {
-                            print("No ID")
-                            continue
-                        }
-
-                        guard let url = value["url_z"] as? String else {
-                            print("No URL Available")
-                            continue
-                        }
-
-                        performStandardPriority(action: { 
-                            FlickrClient.sharedInstance.getImageFromURL(url, completionHandler: { (result, error) in
-                                guard error == nil else {
-                                    print("Error getting Image: \(error)")
-                                    return
-                                }
-
-                                guard let imageData = result as? NSData else {
-                                    print("Data format incorrect")
-                                    return
-                                }
-
-                                self.stack.performBackgroundBatchOperation({ (context) in
-                                    let newPhoto = Photo(imageData: imageData, pin: newPin, index: index, url: url, id: Int(id)!, context: context)
-                                    print("New Photo: \(newPhoto)")
-                                })
-
-                            })
-
-                        })
-
-                    }
-
+                    performHighPriority(action: {
+                        self.getDataForAnnotation(pin: newPin)
+                    })
                 })
 
             })
@@ -165,6 +119,62 @@ class MapViewController: UIViewController {
         }
 
     }
+
+
+    func getDataForAnnotation(pin pin: Pin) {
+
+        // Get Data for Annotation
+        FlickrClient.sharedInstance.getPhotosFromCoordinates(longitude: String(pin.coordinates.longitude), latitude: String(pin.coordinates.latitude), completionHandler: { (result, error) in
+
+            guard error == nil else {
+                self.displayOneButtonAlert("Alert", message: error)
+                return
+            }
+
+            guard let photoArray = result as? [[String: AnyObject]] else {
+                self.displayOneButtonAlert("Oops", message: "Something went wrong here.")
+                return
+            }
+
+            for (index, value) in photoArray.enumerate() {
+
+                guard let id = value["id"] as? String else {
+                    print("No ID")
+                    continue
+                }
+
+                guard let url = value["url_z"] as? String else {
+                    print("No URL Available")
+                    continue
+                }
+
+                performStandardPriority(action: {
+                    FlickrClient.sharedInstance.getImageFromURL(url, completionHandler: { (result, error) in
+                        guard error == nil else {
+                            print("Error getting Image: \(error)")
+                            return
+                        }
+
+                        guard let imageData = result as? NSData else {
+                            print("Data format incorrect")
+                            return
+                        }
+
+                        self.stack.performBackgroundBatchOperation({ (context) in
+                            let newPhoto = Photo(imageData: imageData, pin: pin, index: index, url: url, id: Int(id)!, context: context)
+                            print("New Photo: \(newPhoto)")
+                        })
+
+                    })
+
+                })
+
+            }
+
+        })
+
+    }
+
 
 
     /// Get Pin Data form Database.
@@ -193,7 +203,7 @@ class MapViewController: UIViewController {
                     continue
             }
 
-            let annotation = MKPointAnnotation()
+            let annotation = TravelLocationPointAnnotation(pin: item)
             annotation.coordinate = CLLocationCoordinate2D(latitude: Double(latitude), longitude: Double(longitude))
             mapView.addAnnotation(annotation)
 
@@ -214,7 +224,11 @@ class MapViewController: UIViewController {
 extension MapViewController: MKMapViewDelegate {
 
     func mapView(mapView: MKMapView, didSelectAnnotationView view: MKAnnotationView) {
-        print("Pin Selected")
+        guard let annotation = view.annotation as? TravelLocationPointAnnotation else {
+            return
+        }
+
+        print(annotation.pin)
 
         if editable == true {
             performOnMain({ 
