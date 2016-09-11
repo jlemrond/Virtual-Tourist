@@ -84,10 +84,10 @@
             </objects>
             <point key="canvasLocation" x="330" y="327"/>
         </scene>
-        <!--View Controller-->
+        <!--Pin Detail View Controller-->
         <scene sceneID="ZQe-xl-H4b">
             <objects>
-                <viewController id="rg3-IG-By0" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="PinDetailViewController" id="rg3-IG-By0" customClass="PinDetailViewController" customModule="VirtualTourist" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="rhr-Fb-jEY"/>
                         <viewControllerLayoutGuide type="bottom" id="wb7-WV-lZC"/>

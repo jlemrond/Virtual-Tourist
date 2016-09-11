@@ -22,6 +22,7 @@
 		EA221FA81D852BDA0098E4D4 /* Pin+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA221FA41D852BDA0098E4D4 /* Pin+CoreDataProperties.swift */; };
 		EA221FA91D852BDA0098E4D4 /* Pin.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA221FA51D852BDA0098E4D4 /* Pin.swift */; };
 		EA221FAB1D85A71C0098E4D4 /* TravelLocationPointAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA221FAA1D85A71C0098E4D4 /* TravelLocationPointAnnotation.swift */; };
+		EA221FAD1D85F9210098E4D4 /* PinDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA221FAC1D85F9210098E4D4 /* PinDetailViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,6 +43,7 @@
 		EA221FA41D852BDA0098E4D4 /* Pin+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Pin+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		EA221FA51D852BDA0098E4D4 /* Pin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pin.swift; sourceTree = "<group>"; };
 		EA221FAA1D85A71C0098E4D4 /* TravelLocationPointAnnotation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TravelLocationPointAnnotation.swift; sourceTree = "<group>"; };
+		EA221FAC1D85F9210098E4D4 /* PinDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinDetailViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -115,6 +117,7 @@
 			isa = PBXGroup;
 			children = (
 				EA221F811D848BA00098E4D4 /* MapViewController.swift */,
+				EA221FAC1D85F9210098E4D4 /* PinDetailViewController.swift */,
 			);
 			name = Controller;
 			sourceTree = "<group>";
@@ -202,6 +205,7 @@
 				EA221FAB1D85A71C0098E4D4 /* TravelLocationPointAnnotation.swift in Sources */,
 				EA221F9A1D84F6C50098E4D4 /* FlickrClient.swift in Sources */,
 				EA221F821D848BA00098E4D4 /* MapViewController.swift in Sources */,
+				EA221FAD1D85F9210098E4D4 /* PinDetailViewController.swift in Sources */,
 				EA221FA81D852BDA0098E4D4 /* Pin+CoreDataProperties.swift in Sources */,
 				EA221FA71D852BDA0098E4D4 /* Photo.swift in Sources */,
 				EA221FA11D85210B0098E4D4 /* Model.xcdatamodeld in Sources */,

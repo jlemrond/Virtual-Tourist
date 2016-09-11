@@ -224,17 +224,27 @@ class MapViewController: UIViewController {
 extension MapViewController: MKMapViewDelegate {
 
     func mapView(mapView: MKMapView, didSelectAnnotationView view: MKAnnotationView) {
+
+        guard editable == false else {
+            performOnMain({ 
+                self.mapView.removeAnnotation(view.annotation!)
+                // TODO: Delete from Database.
+            })
+            return
+        }
+
         guard let annotation = view.annotation as? TravelLocationPointAnnotation else {
             return
         }
 
-        print(annotation.pin)
-
-        if editable == true {
-            performOnMain({ 
-                self.mapView.removeAnnotation(view.annotation!)
-            })
+        guard let pinDetailViewController = storyboard?.instantiateViewControllerWithIdentifier("PinDetailViewController") as? PinDetailViewController else {
+            displayOneButtonAlert("Alert", message: "Unable to display detail view")
+            return
         }
+
+        pinDetailViewController.pin = annotation.pin
+        navigationController?.pushViewController(pinDetailViewController, animated: true)
+
     }
 
 
