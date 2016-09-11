@@ -77,7 +77,8 @@ class MapViewController: UIViewController {
 
             print("Adding Pin to Map")
 
-            performHighPriority(action: { 
+            performHighPriority(action: {
+                
                 let touchPoint = gestureRecognizer.locationInView(self.mapView)
                 let pinCoordinates = self.mapView.convertPoint(touchPoint, toCoordinateFromView: self.mapView)
                 print(String(pinCoordinates.latitude))
@@ -93,13 +94,15 @@ class MapViewController: UIViewController {
                 // Get Data for Annotation
                 FlickrClient.sharedInstance.getPhotosFromCoordinates(longitude: String(pinCoordinates.longitude), latitude: String(pinCoordinates.latitude), completionHandler: { (result, error) in
 
-                    if error == nil {
-                        print("YES")
-                    } else {
-                        print("NO")
+                    guard error == nil else {
+                        self.displayOneButtonAlert("Alert", message: error)
+                        return
                     }
 
+
+
                 })
+
             })
 
         }

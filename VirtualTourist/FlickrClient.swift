@@ -32,10 +32,24 @@ class FlickrClient: Networkable {
         let request = NSMutableURLRequest(URL: url)
 
         makeAPIRequest(request) { (result, error) in
-            guard error == nil else {
+
+            guard let jsonData = result else {
                 completionHandler(result: nil, error: error?.localizedDescription)
                 return
             }
+
+            guard let photos = jsonData[ResponseKeys.photos] as? [String: AnyObject] else {
+                completionHandler(result: nil, error: errors.noData.rawValue)
+                return
+            }
+
+            guard photos[ResponseKeys.total] as? Int > 0 else {
+                completionHandler(result: errors.noPhotos.rawValue, error: nil)
+                return
+            }
+
+            // TODO: Add Photos to Model.
+
 
             completionHandler(result: result, error: nil)
         }
@@ -95,7 +109,17 @@ extension FlickrClient {
         static let limit = "24"
         static let url = "url_z"
         static let format = "json"
+    }
 
+    struct ResponseKeys {
+        static let photos = "photos"
+        static let photo = "photo"
+        static let total = "total"
+    }
+
+    enum errors: String {
+        case noPhotos = "No Photos Returned from Flickr."
+        case noData = "No Data Returned."
     }
 
 }
