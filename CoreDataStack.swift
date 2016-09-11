@@ -180,3 +180,37 @@ struct CoreDataStack {
     }
 
 }
+
+
+// ******************************************************
+//   MARK: - Model Constants
+// ******************************************************
+
+
+struct Model {
+
+
+    static let pin = "Pin"
+    static let photo = "Photo"
+
+
+    struct PinKeys {
+
+        static let id = "id"
+        static let createDate = "createDate"
+        static let latitude = "latitude"
+        static let longitude = "longitude"
+
+    }
+
+    struct PhotoKeys {
+
+        static let id = "id"
+        static let image = "image"
+        static let index = "index"
+        static let url = "url"
+
+    }
+
+
+}
