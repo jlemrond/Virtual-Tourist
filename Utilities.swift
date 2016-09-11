@@ -53,7 +53,8 @@ func performLowPriority(action action: () -> Void) {
 func performOnMainAfter(seconds: Int, action: () -> Void) {
 
     let delay = UInt64(seconds) * NSEC_PER_SEC
-    dispatch_after(delay, GlobalQueue.main) { 
+    let time = dispatch_time(DISPATCH_TIME_NOW, Int64(delay))
+    dispatch_after(time, GlobalQueue.main) {
         action()
     }
 
