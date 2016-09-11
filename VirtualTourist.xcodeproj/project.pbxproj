@@ -14,6 +14,8 @@
 		EA221F8A1D848BA00098E4D4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EA221F881D848BA00098E4D4 /* LaunchScreen.storyboard */; };
 		EA221F931D848BDE0098E4D4 /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA221F921D848BDE0098E4D4 /* CoreDataStack.swift */; };
 		EA221F951D84A3CB0098E4D4 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA221F941D84A3CB0098E4D4 /* Utilities.swift */; };
+		EA221F9A1D84F6C50098E4D4 /* FlickrClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA221F991D84F6C50098E4D4 /* FlickrClient.swift */; };
+		EA221F9C1D84FCA90098E4D4 /* Networkable.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA221F9B1D84FCA90098E4D4 /* Networkable.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +28,8 @@
 		EA221F8B1D848BA00098E4D4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		EA221F921D848BDE0098E4D4 /* CoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CoreDataStack.swift; path = ../CoreDataStack.swift; sourceTree = "<group>"; };
 		EA221F941D84A3CB0098E4D4 /* Utilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Utilities.swift; path = ../Utilities.swift; sourceTree = "<group>"; };
+		EA221F991D84F6C50098E4D4 /* FlickrClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlickrClient.swift; sourceTree = "<group>"; };
+		EA221F9B1D84FCA90098E4D4 /* Networkable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Networkable.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +85,8 @@
 		EA221F961D84A6070098E4D4 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				EA221F991D84F6C50098E4D4 /* FlickrClient.swift */,
+				EA221F9B1D84FCA90098E4D4 /* Networkable.swift */,
 				EA221F921D848BDE0098E4D4 /* CoreDataStack.swift */,
 				EA221F941D84A3CB0098E4D4 /* Utilities.swift */,
 			);
@@ -174,8 +180,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				EA221F931D848BDE0098E4D4 /* CoreDataStack.swift in Sources */,
+				EA221F9A1D84F6C50098E4D4 /* FlickrClient.swift in Sources */,
 				EA221F821D848BA00098E4D4 /* MapViewController.swift in Sources */,
 				EA221F951D84A3CB0098E4D4 /* Utilities.swift in Sources */,
+				EA221F9C1D84FCA90098E4D4 /* Networkable.swift in Sources */,
 				EA221F801D848BA00098E4D4 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -80,16 +80,27 @@ class MapViewController: UIViewController {
             performHighPriority(action: { 
                 let touchPoint = gestureRecognizer.locationInView(self.mapView)
                 let pinCoordinates = self.mapView.convertPoint(touchPoint, toCoordinateFromView: self.mapView)
+                print(String(pinCoordinates.latitude))
 
                 // Create Annotation
                 let annotation = MKPointAnnotation()
                 annotation.coordinate = pinCoordinates
+                print("New Pin Coord: \(pinCoordinates)")
                 performOnMain({ 
                     self.mapView.addAnnotation(annotation)
                 })
-            })
 
-            // TODO: Begin downloading data.
+                // Get Data for Annotation
+                FlickrClient.sharedInstance.getPhotosFromCoordinates(longitude: String(pinCoordinates.longitude), latitude: String(pinCoordinates.latitude), completionHandler: { (result, error) in
+
+                    if error == nil {
+                        print("YES")
+                    } else {
+                        print("NO")
+                    }
+
+                })
+            })
 
         }
 
