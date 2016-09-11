@@ -22,6 +22,9 @@ class MapViewController: UIViewController {
 
     var editable = false
 
+    let delegate = UIApplication.sharedApplication().delegate as! AppDelegate
+    var stack: CoreDataStack!
+
 
 
     // ******************************************************
@@ -33,6 +36,7 @@ class MapViewController: UIViewController {
 
         // Set Delegate.
         mapView.delegate = self
+        stack = delegate.stack
 
         // Create Long Press Gesture to Add Pin.
         let longPressOnMap = UILongPressGestureRecognizer(target: self, action: #selector(addPin))
@@ -86,17 +90,24 @@ class MapViewController: UIViewController {
             print("Adding Pin to Map")
 
             performHighPriority(action: {
-                
+
+                // Get Touch Point.
                 let touchPoint = gestureRecognizer.locationInView(self.mapView)
                 let pinCoordinates = self.mapView.convertPoint(touchPoint, toCoordinateFromView: self.mapView)
-                print(String(pinCoordinates.latitude))
 
-                // Create Annotation
+                // Create Annotation.
                 let annotation = MKPointAnnotation()
                 annotation.coordinate = pinCoordinates
                 print("New Pin Coord: \(pinCoordinates)")
                 performOnMain({ 
                     self.mapView.addAnnotation(annotation)
+                })
+
+                // Create Pin in Background Context for Data Model.
+                var newPin: Pin!
+                self.stack.performBackgroundBatchOperation({ (context) in
+                    newPin = Pin(coordinates: pinCoordinates, context: context)
+                    print("Added pin with id: \(newPin?.id)")
                 })
 
                 // Get Data for Annotation
@@ -105,6 +116,46 @@ class MapViewController: UIViewController {
                     guard error == nil else {
                         self.displayOneButtonAlert("Alert", message: error)
                         return
+                    }
+
+                    guard let photoArray = result as? [[String: AnyObject]] else {
+                        self.displayOneButtonAlert("Oops", message: "Something went wrong here.")
+                        return
+                    }
+
+                    for (index, value) in photoArray.enumerate() {
+
+                        guard let id = value["id"] as? String else {
+                            print("No ID")
+                            continue
+                        }
+
+                        guard let url = value["url_z"] as? String else {
+                            print("No URL Available")
+                            continue
+                        }
+
+                        performStandardPriority(action: { 
+                            FlickrClient.sharedInstance.getImageFromURL(url, completionHandler: { (result, error) in
+                                guard error == nil else {
+                                    print("Error getting Image: \(error)")
+                                    return
+                                }
+
+                                guard let imageData = result as? NSData else {
+                                    print("Data format incorrect")
+                                    return
+                                }
+
+                                self.stack.performBackgroundBatchOperation({ (context) in
+                                    let newPhoto = Photo(imageData: imageData, pin: newPin, index: index, url: url, id: Int(id)!, context: context)
+                                    print("New Photo: \(newPhoto)")
+                                })
+
+                            })
+
+                        })
+
                     }
 
                 })
@@ -125,29 +176,28 @@ class MapViewController: UIViewController {
         let fetchRequest = NSFetchRequest()
         fetchRequest.entity = NSEntityDescription.entityForName(Model.pin, inManagedObjectContext: stack.mainContext)
 
+        var results: [Pin]
         do {
-            let results = try stack.mainContext.executeFetchRequest(fetchRequest)
+            results = try stack.mainContext.executeFetchRequest(fetchRequest) as! [Pin]
             print("Results \(results)")
         } catch {
             let fetchError = error as NSError
             print(fetchError)
+            return
         }
 
-//        let fetchRequest = NSFetchRequest(entityName: Model.pin)
-//        fetchRequest.sortDescriptors = [NSSortDescriptor(key: Model.PinKeys.createDate, ascending: false)]
-//
-//        let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest,
-//                                                          managedObjectContext: stack.mainContext,
-//                                                            sectionNameKeyPath: nil,
-//                                                                     cacheName: nil)
-//
-//        print("Attempt to fetch results")
-//        do {
-//            let result = try fetchedResultsController.performFetch()
-//            print(result)
-//        } catch {
-//            print("There was an error fetching your results")
-//        }
+        for item in results {
+
+            guard let latitude = item.latitude,
+                let longitude = item.longitude else {
+                    continue
+            }
+
+            let annotation = MKPointAnnotation()
+            annotation.coordinate = CLLocationCoordinate2D(latitude: Double(latitude), longitude: Double(longitude))
+            mapView.addAnnotation(annotation)
+
+        }
 
     }
 

@@ -13,7 +13,7 @@ import UIKit
 
 class Photo: NSManagedObject {
 
-    convenience init?(imageData: NSData, index: Int, url: String, id: Int, context: NSManagedObjectContext) {
+    convenience init?(imageData: NSData, pin: Pin, index: Int, url: String, id: Int, context: NSManagedObjectContext) {
 
         guard let entity = NSEntityDescription.entityForName(Model.photo, inManagedObjectContext: context) else {
             fatalError("Unable to create photo in database")
@@ -24,6 +24,7 @@ class Photo: NSManagedObject {
         self.index = NSNumber(integer: index)
         self.url = url
         self.id = id
+        self.pin = pin
         
     }
 

@@ -34,8 +34,13 @@ class FlickrClient: Networkable {
 
         makeAPIRequest(request) { (result, error) in
 
-            guard let jsonData = result else {
+            guard let data = result as? NSData else {
                 completionHandler(result: nil, error: error?.localizedDescription)
+                return
+            }
+
+            guard let jsonData = self.parseJSONData(data) else {
+                completionHandler(result: nil, error: "Unable to Parse JSON Data")
                 return
             }
 
@@ -44,17 +49,45 @@ class FlickrClient: Networkable {
                 return
             }
 
-            guard photos[ResponseKeys.total] as? Int > 0 else {
-                completionHandler(result: errors.noPhotos.rawValue, error: nil)
+            guard let totalPhotos = (photos[ResponseKeys.total] as? NSString)?.integerValue else {
+                completionHandler(result: nil, error: errors.noData.rawValue)
                 return
             }
 
-            // TODO: Add Photos to Model.
+            guard totalPhotos > 0 else {
+                completionHandler(result: nil, error: errors.noPhotos.rawValue)
+                return
+            }
 
+            guard let photoArray = photos[ResponseKeys.photoArray] as? [[String: AnyObject]] else {
+                completionHandler(result: nil, error: errors.noPhotoArray.rawValue)
+                return
+            }
+
+            completionHandler(result: photoArray, error: nil)
+        }
+
+
+    }
+
+    /// Get Image From URL.
+    func getImageFromURL(url: String, completionHandler: (result: AnyObject?, error: String?) -> Void) {
+
+        guard let url = NSURL(string: url) else {
+            completionHandler(result: nil, error: "No URL")
+            return
+        }
+
+        let request = NSMutableURLRequest(URL: url)
+
+        makeAPIRequest(request) { (result, error) in
+            guard error == nil else {
+                completionHandler(result: nil, error: error?.localizedDescription)
+                return
+            }
 
             completionHandler(result: result, error: nil)
         }
-
 
     }
 
@@ -86,6 +119,13 @@ class FlickrClient: Networkable {
 }
 
 
+
+
+
+// ******************************************************
+//   MARK: - Constants
+// ******************************************************
+
 extension FlickrClient {
 
     struct URL {
@@ -114,13 +154,14 @@ extension FlickrClient {
 
     struct ResponseKeys {
         static let photos = "photos"
-        static let photo = "photo"
+        static let photoArray = "photo"
         static let total = "total"
     }
 
     enum errors: String {
         case noPhotos = "No Photos Returned from Flickr."
         case noData = "No Data Returned."
+        case noPhotoArray = "Unable to get the Photo Collection from Data."
     }
 
 }

@@ -51,12 +51,7 @@ extension Networkable {
                 return
             }
 
-            guard let result = self.parseJSONData(data) else {
-                sendError("Unable to Parse Data")
-                return
-            }
-
-            completionHandler(result: result, error: nil)
+            completionHandler(result: data, error: nil)
             
         }
         

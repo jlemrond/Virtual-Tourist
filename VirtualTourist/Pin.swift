@@ -22,7 +22,7 @@ class Pin: NSManagedObject {
         }
 
         self.init(entity: entity, insertIntoManagedObjectContext: context)
-        id = NSNumber(unsignedInt: arc4random())
+        id = NSNumber(unsignedInt: arc4random_uniform(UInt32(INT32_MAX)))
         longitude = NSNumber(double: coordinates.longitude)
         latitude = NSNumber(double: coordinates.latitude)
         createDate = NSDate()
