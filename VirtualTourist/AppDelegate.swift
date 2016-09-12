@@ -16,34 +16,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     let stack = CoreDataStack(model: "Model")!
 
-    func preloadData() {
-
-        do {
-            try stack.dropAllData()
-        } catch {
-            print("Unable to clear model")
-        }
-
-        print("Data Cleared")
-
-        let orlandoCoords = CLLocationCoordinate2D(latitude: 28.497529128283965, longitude: -81.368113679399485)
-        let jacksonvilleCoords = CLLocationCoordinate2D(latitude: 30.347467074628618, longitude: -81.624461151231131)
-        let newYorkCoords = CLLocationCoordinate2D(latitude: 40.736047244935008, longitude: -73.999948604838309)
-
-        let orlando = Pin(coordinates: orlandoCoords, context: stack.mainContext)
-        let jacksonville = Pin(coordinates: jacksonvilleCoords, context: stack.mainContext)
-        let newYork = Pin(coordinates: newYorkCoords, context: stack.mainContext)
-
-        print(orlando)
-        print(jacksonville)
-        print(newYork)
-
-    }
-
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         stack.autoSave(10)
-        preloadData()
         return true
     }
 
