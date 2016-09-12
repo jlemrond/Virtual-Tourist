@@ -19,6 +19,13 @@ class FlickrClient: Networkable {
 
     let session = NSURLSession.sharedSession()
 
+    var stack: CoreDataStack {
+
+        let delegate = UIApplication.sharedApplication().delegate as! AppDelegate
+        return delegate.stack
+
+    }
+
     
 
     // ******************************************************
@@ -26,7 +33,7 @@ class FlickrClient: Networkable {
     // ******************************************************
 
     /// Get Photos from Flickr when a pin is dropped.
-    func getPhotosFromCoordinates(longitude longitude: String, latitude: String, completionHandler: (result: AnyObject?, error: String?) -> Void) {
+    func getPhotosForPin(longitude longitude: String, latitude: String, pin: Pin, completionHandler: (result: AnyObject?, error: String?) -> Void) {
 
         let url = buildFlickrAPIURL(longitude: longitude, latitude: latitude)
 

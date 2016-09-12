@@ -75,8 +75,6 @@ extension Networkable {
             return nil
         }
 
-        print("JSON Data parsed: \n\(jsonData)")
-
         return jsonData
     }
 

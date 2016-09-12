@@ -14,4 +14,6 @@ class FlickrDetailViewCell: UICollectionViewCell {
     @IBOutlet weak var cellImage: UIImageView!
     @IBOutlet weak var loadingIndicator: UIActivityIndicatorView!
 
+    var photo: Photo!
+
 }
