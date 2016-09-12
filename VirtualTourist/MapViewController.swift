@@ -148,25 +148,9 @@ class MapViewController: UIViewController {
                     continue
                 }
 
-                performStandardPriority(action: {
-                    FlickrClient.sharedInstance.getImageFromURL(url, completionHandler: { (result, error) in
-                        guard error == nil else {
-                            print("Error getting Image: \(error)")
-                            return
-                        }
-
-                        guard let imageData = result as? NSData else {
-                            print("Data format incorrect")
-                            return
-                        }
-
-                        self.stack.performBackgroundBatchOperation({ (context) in
-                            let newPhoto = Photo(imageData: imageData, pin: pin, index: index, url: url, id: Int(id)!, context: context)
-                            print("New Photo: \(newPhoto)")
-                        })
-
-                    })
-
+                self.stack.performBackgroundBatchOperation({ (context) in
+                    let newPhoto = Photo(pin: pin, index: index, url: url, id: Int(id)!, context: context)
+                    print("New Photo: \(newPhoto)")
                 })
 
             }
@@ -223,6 +207,9 @@ class MapViewController: UIViewController {
 
 extension MapViewController: MKMapViewDelegate {
 
+    /// If a pin is selected, a check will be peformed to see if the user is in 'Edit' mode.  If they
+    /// are in 'Edit' mode, the pin will be delete.  If they are not the PinDetailViewController for 
+    /// that pin will be pushed on the stack and presented.
     func mapView(mapView: MKMapView, didSelectAnnotationView view: MKAnnotationView) {
 
         guard editable == false else {

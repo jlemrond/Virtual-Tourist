@@ -104,21 +104,45 @@
                             </mapView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="g1h-d7-a7W">
                                 <rect key="frame" x="0.0" y="208" width="600" height="392"/>
-                                <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="d3r-n0-50G">
-                                    <size key="itemSize" width="50" height="50"/>
+                                <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="3" minimumInteritemSpacing="3" id="d3r-n0-50G">
+                                    <size key="itemSize" width="215" height="215"/>
                                     <size key="headerReferenceSize" width="0.0" height="0.0"/>
                                     <size key="footerReferenceSize" width="0.0" height="0.0"/>
                                     <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 </collectionViewFlowLayout>
                                 <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="FlickerPhotosCollectionCell" id="Y9h-4E-J9k">
-                                        <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="FlickerPhotosCollectionCell" id="Y9h-4E-J9k" customClass="FlickrDetailViewCell" customModule="VirtualTourist" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="215" height="215"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="215" height="215"/>
                                             <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="bbl-Ra-2yt">
+                                                    <rect key="frame" x="0.0" y="0.0" width="215" height="215"/>
+                                                </imageView>
+                                                <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="NZD-bf-3iG">
+                                                    <rect key="frame" x="63.5" y="63.5" width="88" height="88"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="88" id="UI1-zn-osO"/>
+                                                        <constraint firstAttribute="height" constant="88" id="hhq-B2-yX2"/>
+                                                    </constraints>
+                                                </activityIndicatorView>
+                                            </subviews>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </view>
+                                        <constraints>
+                                            <constraint firstItem="bbl-Ra-2yt" firstAttribute="width" secondItem="Y9h-4E-J9k" secondAttribute="width" id="TAq-pD-Gre"/>
+                                            <constraint firstItem="bbl-Ra-2yt" firstAttribute="height" secondItem="Y9h-4E-J9k" secondAttribute="height" id="lpI-aH-I7w"/>
+                                            <constraint firstItem="NZD-bf-3iG" firstAttribute="centerX" secondItem="Y9h-4E-J9k" secondAttribute="centerX" id="qbo-Vj-KIE"/>
+                                            <constraint firstItem="NZD-bf-3iG" firstAttribute="centerY" secondItem="Y9h-4E-J9k" secondAttribute="centerY" id="wb5-Ba-Md6"/>
+                                            <constraint firstItem="bbl-Ra-2yt" firstAttribute="centerY" secondItem="Y9h-4E-J9k" secondAttribute="centerY" id="wcW-bY-fBL"/>
+                                            <constraint firstItem="bbl-Ra-2yt" firstAttribute="centerX" secondItem="Y9h-4E-J9k" secondAttribute="centerX" id="yGe-KQ-2Hx"/>
+                                        </constraints>
+                                        <connections>
+                                            <outlet property="cellImage" destination="bbl-Ra-2yt" id="xnL-Ck-tMW"/>
+                                            <outlet property="loadingIndicator" destination="NZD-bf-3iG" id="50b-Qt-WQI"/>
+                                        </connections>
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
@@ -134,6 +158,10 @@
                             <constraint firstItem="xjd-N4-A7v" firstAttribute="top" secondItem="rhr-Fb-jEY" secondAttribute="bottom" id="wfo-Nj-pYM"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="collectionView" destination="g1h-d7-a7W" id="mzW-SK-HAi"/>
+                        <outlet property="mapView" destination="xjd-N4-A7v" id="oPh-Ws-Yns"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="mXf-L8-R6K" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
