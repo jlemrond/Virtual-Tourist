@@ -101,8 +101,6 @@ class FlickrClient: Networkable {
 
     func buildFlickrAPIURL(longitude longitude: String, latitude: String) -> NSURL {
 
-        // Need query items
-
         let quereyItems: [NSURLQueryItem] = [
             NSURLQueryItem(name: QueryKeys.method, value: QueryValues.method),
             NSURLQueryItem(name: QueryKeys.apiKey, value: QueryValues.APIKey),

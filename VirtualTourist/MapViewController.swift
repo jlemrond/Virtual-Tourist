@@ -49,6 +49,8 @@ class MapViewController: UIViewController {
         // Get Pin Data from Database.
         getPinData()
 
+        deselectAnnotations()
+
     }
 
     // ******************************************************
@@ -59,9 +61,7 @@ class MapViewController: UIViewController {
     @IBAction func editPins(sender: UIBarButtonItem) {
         editable = !editable
 
-        for annotation in mapView.selectedAnnotations {
-            mapView.deselectAnnotation(annotation, animated: true)
-        }
+        deselectAnnotations()
 
         if editable == true {
             editButton.title = "Done"
@@ -77,7 +77,8 @@ class MapViewController: UIViewController {
     //   MARK: - Functions
     // ******************************************************
 
-    /// Adds a pin to the Map View.
+    /// Adds a pin to the Map View upon a long press.  Pin is added at the location
+    /// of the gesture.
     func addPin(gestureRecognizer: UIGestureRecognizer) {
 
         if gestureRecognizer.state == UIGestureRecognizerState.Began {
@@ -120,10 +121,9 @@ class MapViewController: UIViewController {
 
     }
 
-
+    /// Get Data from Flickr for each annotation.  Including URLs for photos in the area.
     func getDataForAnnotation(pin pin: Pin) {
 
-        // Get Data for Annotation
         FlickrClient.sharedInstance.getPhotosForPin(longitude: String(pin.coordinates.longitude), latitude: String(pin.coordinates.latitude), pin: pin, completionHandler: { (result, error) in
 
             guard error == nil else {
@@ -161,7 +161,7 @@ class MapViewController: UIViewController {
 
 
 
-    /// Get Pin Data form Database.
+    /// Gets the pins already currently stored in Core Data.
     func getPinData() {
 
         let delegate = UIApplication.sharedApplication().delegate as! AppDelegate
@@ -192,6 +192,13 @@ class MapViewController: UIViewController {
 
         }
 
+    }
+
+    /// Check for selected annotations and deselect them.
+    func deselectAnnotations() {
+        for annotation in mapView.selectedAnnotations {
+            mapView.deselectAnnotation(annotation, animated: true)
+        }
     }
 
 }

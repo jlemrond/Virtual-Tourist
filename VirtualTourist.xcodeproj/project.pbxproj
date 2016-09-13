@@ -81,7 +81,6 @@
 				EA221F981D84A6180098E4D4 /* View */,
 				EA221F971D84A6130098E4D4 /* Controller */,
 				EA221F961D84A6070098E4D4 /* Model */,
-				EA221F7F1D848BA00098E4D4 /* AppDelegate.swift */,
 				EA221F911D848BAF0098E4D4 /* SupportingFiles */,
 			);
 			path = VirtualTourist;
@@ -90,6 +89,7 @@
 		EA221F911D848BAF0098E4D4 /* SupportingFiles */ = {
 			isa = PBXGroup;
 			children = (
+				EA221F7F1D848BA00098E4D4 /* AppDelegate.swift */,
 				EA221F831D848BA00098E4D4 /* Main.storyboard */,
 				EA221F861D848BA00098E4D4 /* Assets.xcassets */,
 				EA221F881D848BA00098E4D4 /* LaunchScreen.storyboard */,
@@ -366,6 +366,7 @@
 				EA221F901D848BA00098E4D4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 

@@ -61,6 +61,8 @@ class PinDetailViewController: UIViewController {
     //   MARK: - UI Setup Functions
     // ******************************************************
 
+    /// Set up map at the top of view to display the location of the pin and the
+    /// surrounding area.
     func setUpMapView() {
         let region = MKCoordinateRegionMakeWithDistance(pin.coordinates, 1500, 1500)
         mapView.setRegion(region, animated: true)
@@ -70,7 +72,8 @@ class PinDetailViewController: UIViewController {
         mapView.addAnnotation(annotation)
     }
 
-
+    /// Get the images from the photoSet within the fetched Resulsts Controller.  Uses
+    /// the URL attached to the photo to return an NSData object to create the images.
     func getImages() {
 
         guard let photoSet = fetchedResultsController?.fetchedObjects as? [Photo] else {
@@ -118,6 +121,7 @@ class PinDetailViewController: UIViewController {
     //   MARK: - Core Data Functions
     // ******************************************************
 
+    /// Create Fetched Results Controller.
     func createFetchResultsController() {
 
         let delegate = UIApplication.sharedApplication().delegate as! AppDelegate
@@ -131,6 +135,8 @@ class PinDetailViewController: UIViewController {
 
     }
 
+    /// Execute Fetch Request Search and then begin getting images based on the
+    /// data proved by Flickr.
     func executeSearch(){
 
         do {
@@ -139,7 +145,7 @@ class PinDetailViewController: UIViewController {
             getImages()
 
         } catch let error as NSError {
-            print("Error while trying to perform a search: \n\(error)\n\(fetchedResultsController)")
+            displayOneButtonAlert("Alert", message: error.localizedDescription)
         }
     }
 
@@ -149,6 +155,8 @@ class PinDetailViewController: UIViewController {
     //   MARK: - Buttons
     // ******************************************************
 
+    /// Deletes the current photos attached to the respective pin and then executes
+    /// another API Call to get a refresh on the photos from Flickr.
     @IBAction func getNewCollection() {
         print("Get New Collection Called")
 
@@ -162,6 +170,13 @@ class PinDetailViewController: UIViewController {
 
     }
 
+
+
+    // ******************************************************
+    //   MARK: - Functions
+    // ******************************************************
+
+    /// Makes a call to the Flickr API to get photos based on the pin location.
     func getCollection(completion: () -> Void) {
         FlickrClient.sharedInstance.getPhotosForPin(longitude: String(pin.coordinates.longitude), latitude: String(pin.coordinates.latitude), pin: pin) { (result, error) in
 
@@ -198,6 +213,7 @@ class PinDetailViewController: UIViewController {
 
     }
 
+    /// Deletes the current photos in the collection view.
     func deletePhotos(completion: () -> Void) {
 
         stack.performBackgroundBatchOperation { (context) in
@@ -224,6 +240,8 @@ class PinDetailViewController: UIViewController {
 
 extension PinDetailViewController: UICollectionViewDataSource {
 
+
+    /// Number of Items In Section based on the number of objects in the fetchedResultsController.
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
 
         guard let fetchedResultsController = fetchedResultsController else {
@@ -233,6 +251,8 @@ extension PinDetailViewController: UICollectionViewDataSource {
         return fetchedResultsController.sections![section].numberOfObjects
     }
 
+    /// Creates cells based on the information attached to each photo.  If no image is attached a 
+    /// loading indicator is displayed as a placeholder.
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
 
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("FlickerPhotosCollectionCell", forIndexPath: indexPath) as! FlickrDetailViewCell
@@ -254,6 +274,7 @@ extension PinDetailViewController: UICollectionViewDataSource {
 
     }
 
+    /// Delete a cell if it is selected.
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
 
         guard let cell = collectionView.cellForItemAtIndexPath(indexPath) as? FlickrDetailViewCell else {
@@ -277,6 +298,7 @@ extension PinDetailViewController: UICollectionViewDataSource {
 
 extension PinDetailViewController: UICollectionViewDelegateFlowLayout {
 
+    /// Size of cell based on 1/3 the width of the screen.
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
 
         let screenWidth: CGFloat = UIScreen.mainScreen().bounds.width
@@ -299,7 +321,6 @@ extension PinDetailViewController: UICollectionViewDelegateFlowLayout {
 extension PinDetailViewController: NSFetchedResultsControllerDelegate {
 
     func controllerWillChangeContent(controller: NSFetchedResultsController) {
-        print("Will Change")
 
         blockOperations.removeAll(keepCapacity: false)
     }
@@ -309,8 +330,6 @@ extension PinDetailViewController: NSFetchedResultsControllerDelegate {
         guard let indexPath = indexPath else {
             return
         }
-
-        print("Change Type: \(type.rawValue)")
 
         switch type {
         case .Insert:
@@ -351,8 +370,6 @@ extension PinDetailViewController: NSFetchedResultsControllerDelegate {
 
     func controller(controller: NSFetchedResultsController, didChangeSection sectionInfo: NSFetchedResultsSectionInfo, atIndex sectionIndex: Int, forChangeType type: NSFetchedResultsChangeType) {
 
-        print("Change Type: \(type.rawValue)")
-
         switch type {
         case .Insert:
             let block = NSBlockOperation(block: {
@@ -382,8 +399,6 @@ extension PinDetailViewController: NSFetchedResultsControllerDelegate {
     func controllerDidChangeContent(controller: NSFetchedResultsController) {
         performOnMain { 
             self.collectionView.performBatchUpdates({
-
-                print("Did Finish")
 
                 for block in self.blockOperations {
                     block.start()
