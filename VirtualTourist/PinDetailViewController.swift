@@ -22,7 +22,7 @@ class PinDetailViewController: UIViewController {
 
     var pin: Pin!
     var stack: CoreDataStack!
-    var photoArray: [Photo]!
+    var photoArray: NSSet?
     var blockOperations: [NSBlockOperation] = []
 
     var fetchedResultsController: NSFetchedResultsController? {
@@ -40,7 +40,7 @@ class PinDetailViewController: UIViewController {
     // ******************************************************
 
     override func viewDidLoad() {
-        print("View for \(pin) loaded")
+        //print("View for \(pin) loaded")
 
         setUpMapView()
 
@@ -73,20 +73,15 @@ class PinDetailViewController: UIViewController {
 
     func getImages() {
 
-        guard let photosArray = photoArray else {
+        guard let photoSet = fetchedResultsController?.fetchedObjects as? [Photo] else {
             print("No set of photos")
             return
         }
 
-        for (index, photo) in photosArray.enumerate() {
+        for photo in photoSet {
 
             guard let indexPath = fetchedResultsController?.indexPathForObject(photo) else {
                 print("Unable to locate object")
-                return
-            }
-
-            guard let url = photo.url else {
-                print("Photo object does not have URL attached.")
                 return
             }
 
@@ -96,7 +91,7 @@ class PinDetailViewController: UIViewController {
             }
 
             performHighPriority(action: { 
-                FlickrClient.sharedInstance.getImageFromURL(url, completionHandler: { (result, error) in
+                FlickrClient.sharedInstance.getImageFromURL(String(photo.url!), completionHandler: { (result, error) in
                     guard error == nil else {
                         print("Error getting image: \(error)")
                         return
@@ -132,26 +127,17 @@ class PinDetailViewController: UIViewController {
         request.sortDescriptors = [NSSortDescriptor(key: "index", ascending: true)]
         request.predicate = NSPredicate(format: "pin = %@", argumentArray: [pin!])
 
-        fetchedResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.mainContext, sectionNameKeyPath: nil, cacheName: nil)
-
-        do {
-            photoArray = try stack.mainContext.executeFetchRequest(request) as? [Photo]
-
-            getImages()
-        } catch {
-            print("Unable to get photos")
-        }
+        fetchedResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.backgroundContext, sectionNameKeyPath: nil, cacheName: nil)
 
     }
 
     func executeSearch(){
-        guard  let fetchedResultsController = fetchedResultsController else {
-            print("Unable to get Fetch Results Controlelr")
-            return
-        }
 
         do {
-            try fetchedResultsController.performFetch()
+            try fetchedResultsController!.performFetch()
+
+            getImages()
+
         } catch let error as NSError {
             print("Error while trying to perform a search: \n\(error)\n\(fetchedResultsController)")
         }
@@ -166,21 +152,47 @@ class PinDetailViewController: UIViewController {
     @IBAction func getNewCollection() {
         print("Get New Collection Called")
 
-        deletePhotos { 
-            self.getCollection({ (photoArray) in
-                print("collection returned")
-            })
+        stack.performBackgroundBatchOperation { (context) in
+            self.deletePhotos {
+                self.getCollection({ () in
+                    self.createFetchResultsController()
+                })
+            }
         }
 
     }
 
-    func getCollection(completion: (photoArray: [[String: AnyObject]]) -> Void) {
-        FlickrClient.sharedInstance.getPhotosForPin(longitude: String(pin.coordinates.longitude), latitude: String(pin.coordinates.latitude), pin: pin) { (error) in
+    func getCollection(completion: () -> Void) {
+        FlickrClient.sharedInstance.getPhotosForPin(longitude: String(pin.coordinates.longitude), latitude: String(pin.coordinates.latitude), pin: pin) { (result, error) in
 
             guard error == nil else {
                 self.displayOneButtonAlert("Alert", message: error)
                 return
             }
+
+            guard let photoArray = result as? [[String: AnyObject]] else {
+                self.displayOneButtonAlert("Alert", message: "No photos returned")
+                return
+            }
+
+            for (index, value) in photoArray.enumerate() {
+
+                guard let id = value["id"] as? String else {
+                    print("No ID")
+                    continue
+                }
+
+                guard let url = value["url_z"] as? String else {
+                    print("No URL Available")
+                    continue
+                }
+
+                let newPhoto = Photo(index: index, url: url, id: Int(id)!, context: self.stack.backgroundContext)
+                newPhoto!.pin = self.pin
+
+            }
+
+            completion()
 
         }
 
@@ -188,23 +200,12 @@ class PinDetailViewController: UIViewController {
 
     func deletePhotos(completion: () -> Void) {
 
-        let request = NSFetchRequest(entityName: Model.photo)
-        let predicate = NSPredicate(format: "pin = %@", argumentArray: [pin])
-        request.sortDescriptors = [NSSortDescriptor(key: "index", ascending: true)]
-        request.predicate = predicate
-
         stack.performBackgroundBatchOperation { (context) in
+            for entity in self.fetchedResultsController?.fetchedObjects as! [Photo] {
 
-            do {
-                let entitiesToDelete = try context.executeFetchRequest(request) as? [Photo]
-
-                for entity in entitiesToDelete! {
-                    context.deleteObject(entity)
-                }
-            } catch {
-                print("Unable to delete photos")
+                self.fetchedResultsController?.managedObjectContext.deleteObject(entity)
+                
             }
-
         }
 
         completion()
@@ -255,13 +256,13 @@ extension PinDetailViewController: UICollectionViewDataSource {
 
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
 
-        print("Delete")
-
         guard let cell = collectionView.cellForItemAtIndexPath(indexPath) as? FlickrDetailViewCell else {
             return
         }
 
-        fetchedResultsController?.managedObjectContext.deleteObject(cell.photo)
+        stack.performBackgroundBatchOperation { (context) in
+            self.fetchedResultsController?.managedObjectContext.deleteObject(cell.photo)
+        }
 
     }
 
@@ -339,7 +340,7 @@ extension PinDetailViewController: NSFetchedResultsControllerDelegate {
             blockOperations.append(block)
 
         case .Update:
-            let block = NSBlockOperation(block: { 
+            let block = NSBlockOperation(block: {
                 self.collectionView.reloadItemsAtIndexPaths([indexPath])
             })
 
@@ -379,20 +380,21 @@ extension PinDetailViewController: NSFetchedResultsControllerDelegate {
     }
 
     func controllerDidChangeContent(controller: NSFetchedResultsController) {
-        collectionView.performBatchUpdates({
+        performOnMain { 
+            self.collectionView.performBatchUpdates({
 
-            print("Did Finish")
+                print("Did Finish")
 
-            for block in self.blockOperations {
-                block.start()
-            }
+                for block in self.blockOperations {
+                    block.start()
+                }
 
             }) { (success) in
                 self.blockOperations.removeAll(keepCapacity: false)
-                performOnMain({ 
-                    self.collectionView.reloadData()
-                })
+                self.collectionView.reloadData()
+            }
         }
+
     }
 
 }

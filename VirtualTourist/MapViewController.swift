@@ -124,14 +124,36 @@ class MapViewController: UIViewController {
     func getDataForAnnotation(pin pin: Pin) {
 
         // Get Data for Annotation
-        FlickrClient.sharedInstance.getPhotosForPin(longitude: String(pin.coordinates.longitude), latitude: String(pin.coordinates.latitude), pin: pin, completionHandler: { (error) in
+        FlickrClient.sharedInstance.getPhotosForPin(longitude: String(pin.coordinates.longitude), latitude: String(pin.coordinates.latitude), pin: pin, completionHandler: { (result, error) in
 
             guard error == nil else {
                 self.displayOneButtonAlert("Alert", message: error)
                 return
             }
 
-            print("Photos added to Pin")
+            guard let photoArray = result as? [[String: AnyObject]] else {
+                self.displayOneButtonAlert("Alert", message: "No photos returned")
+                return
+            }
+
+            for (index, value) in photoArray.enumerate() {
+
+                guard let id = value["id"] as? String else {
+                    print("No ID")
+                    continue
+                }
+
+                guard let url = value["url_z"] as? String else {
+                    print("No URL Available")
+                    continue
+                }
+
+                self.stack.performBackgroundBatchOperation({ (context) in
+                    let newPhoto = Photo(index: index, url: url, id: Int(id)!, context: context)
+                    newPhoto!.pin = pin
+                })
+                
+            }
 
         })
 
@@ -146,12 +168,11 @@ class MapViewController: UIViewController {
         let stack = delegate.stack
 
         let fetchRequest = NSFetchRequest()
-        fetchRequest.entity = NSEntityDescription.entityForName(Model.pin, inManagedObjectContext: stack.mainContext)
+        fetchRequest.entity = NSEntityDescription.entityForName(Model.pin, inManagedObjectContext: stack.backgroundContext)
 
         var results: [Pin]
         do {
-            results = try stack.mainContext.executeFetchRequest(fetchRequest) as! [Pin]
-            print("Results \(results)")
+            results = try stack.backgroundContext.executeFetchRequest(fetchRequest) as! [Pin]
         } catch {
             let fetchError = error as NSError
             print(fetchError)
@@ -208,6 +229,7 @@ extension MapViewController: MKMapViewDelegate {
         }
 
         pinDetailViewController.pin = annotation.pin
+        pinDetailViewController.photoArray = annotation.pin.photos
         navigationController?.pushViewController(pinDetailViewController, animated: true)
 
     }

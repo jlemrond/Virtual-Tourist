@@ -33,7 +33,7 @@ class FlickrClient: Networkable {
     // ******************************************************
 
     /// Get Photos from Flickr when a pin is dropped.
-    func getPhotosForPin(longitude longitude: String, latitude: String, pin: Pin, completionHandler: (error: String?) -> Void) {
+    func getPhotosForPin(longitude longitude: String, latitude: String, pin: Pin, completionHandler: (result: AnyObject?, error: String?) -> Void) {
 
         let url = buildFlickrAPIURL(longitude: longitude, latitude: latitude)
 
@@ -42,55 +42,36 @@ class FlickrClient: Networkable {
         makeAPIRequest(request) { (result, error) in
 
             guard let data = result as? NSData else {
-                completionHandler(error: error?.localizedDescription)
+                completionHandler(result: nil, error: error?.localizedDescription)
                 return
             }
 
             guard let jsonData = self.parseJSONData(data) else {
-                completionHandler(error: "Unable to Parse JSON Data")
+                completionHandler(result: nil, error: "Unable to Parse JSON Data")
                 return
             }
 
             guard let photos = jsonData[ResponseKeys.photos] as? [String: AnyObject] else {
-                completionHandler(error: errors.noData.rawValue)
+                completionHandler(result: nil, error: errors.noData.rawValue)
                 return
             }
 
             guard let totalPhotos = (photos[ResponseKeys.total] as? NSString)?.integerValue else {
-                completionHandler(error: errors.noData.rawValue)
+                completionHandler(result: nil, error: errors.noData.rawValue)
                 return
             }
 
             guard totalPhotos > 0 else {
-                completionHandler(error: errors.noPhotos.rawValue)
+                completionHandler(result: nil, error: errors.noPhotos.rawValue)
                 return
             }
 
             guard let photoArray = photos[ResponseKeys.photoArray] as? [[String: AnyObject]] else {
-                completionHandler(error: errors.noPhotoArray.rawValue)
+                completionHandler(result: nil, error: errors.noPhotoArray.rawValue)
                 return
             }
 
-            for (index, value) in photoArray.enumerate() {
-
-                guard let id = value["id"] as? String else {
-                    print("No ID")
-                    continue
-                }
-
-                guard let url = value["url_z"] as? String else {
-                    print("No URL Available")
-                    continue
-                }
-
-                self.stack.performBackgroundBatchOperation({ (context) in
-                    let newPhoto = Photo(pin: pin, index: index, url: url, id: Int(id)!, context: context)
-                    print("New Photo: \(newPhoto)")
-                })
-                
-            }
-
-            completionHandler(error: nil)
+            completionHandler(result: photoArray, error: nil)
         }
 
 
