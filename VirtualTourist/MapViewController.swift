@@ -124,38 +124,14 @@ class MapViewController: UIViewController {
     func getDataForAnnotation(pin pin: Pin) {
 
         // Get Data for Annotation
-        FlickrClient.sharedInstance.getPhotosForPin(longitude: String(pin.coordinates.longitude), latitude: String(pin.coordinates.latitude), pin: pin, completionHandler: { (result, error) in
+        FlickrClient.sharedInstance.getPhotosForPin(longitude: String(pin.coordinates.longitude), latitude: String(pin.coordinates.latitude), pin: pin, completionHandler: { (error) in
 
             guard error == nil else {
                 self.displayOneButtonAlert("Alert", message: error)
                 return
             }
 
-            guard let photoArray = result as? [[String: AnyObject]] else {
-                self.displayOneButtonAlert("Aleft", message: "No Data Returned")
-                return
-            }
-
-            for (index, value) in photoArray.enumerate() {
-
-                guard let id = value["id"] as? String else {
-                    print("No ID")
-                    continue
-                }
-
-                guard let url = value["url_z"] as? String else {
-                    print("No URL Available")
-                    continue
-                }
-
-                self.stack.performBackgroundBatchOperation({ (context) in
-                    let newPhoto = Photo(pin: pin, index: index, url: url, id: Int(id)!, context: context)
-                    print("New Photo: \(newPhoto)")
-                })
-                
-            }
-
-            print("Result")
+            print("Photos added to Pin")
 
         })
 

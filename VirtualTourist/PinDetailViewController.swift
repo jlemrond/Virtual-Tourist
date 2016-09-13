@@ -51,6 +51,11 @@ class PinDetailViewController: UIViewController {
 
     }
 
+    override func viewWillDisappear(animated: Bool) {
+        super.viewWillDisappear(animated)
+        blockOperations.removeAll()
+    }
+
 
     // ******************************************************
     //   MARK: - UI Setup Functions
@@ -75,7 +80,10 @@ class PinDetailViewController: UIViewController {
 
         for (index, photo) in photosArray.enumerate() {
 
-            let indexPath = NSIndexPath(forItem: index, inSection: 0)
+            guard let indexPath = fetchedResultsController?.indexPathForObject(photo) else {
+                print("Unable to locate object")
+                return
+            }
 
             guard let url = photo.url else {
                 print("Photo object does not have URL attached.")
@@ -128,13 +136,11 @@ class PinDetailViewController: UIViewController {
 
         do {
             photoArray = try stack.mainContext.executeFetchRequest(request) as? [Photo]
+
+            getImages()
         } catch {
             print("Unable to get photos")
         }
-
-        print("PhotoArray: \(photoArray)")
-
-        getImages()
 
     }
 
@@ -151,55 +157,6 @@ class PinDetailViewController: UIViewController {
         }
     }
 
-    func changeExisitingPhotos(photoArray: [[String: AnyObject]]) {
-
-        let request = NSFetchRequest(entityName: Model.photo)
-        let predicate = NSPredicate(format: "pin = %@", argumentArray: [pin])
-        request.sortDescriptors = [NSSortDescriptor(key: "index", ascending: true)]
-        request.predicate = predicate
-
-        stack.performBackgroundBatchOperation { (context) in
-            do {
-                let entities = try context.executeFetchRequest(request) as! [Photo]
-
-                for (index, entity) in entities.enumerate() {
-
-                    guard let id = photoArray[index]["id"] as? String else {
-                        print("No ID")
-                        continue
-                    }
-
-                    guard let url = photoArray[index]["url_z"] as? String else {
-                        print("No URL Available")
-                        continue
-                    }
-
-                    FlickrClient.sharedInstance.getImageFromURL(url, completionHandler: { (result, error) in
-                        guard error == nil else {
-                            print("Error getting image: \(error)")
-                            return
-                        }
-
-                        guard let imageData = result as? NSData else {
-                            print("Unable to get image data.")
-                            return
-                        }
-
-                        entity.image = imageData
-                        entity.id = Int(id)
-                        entity.url = url
-
-                    })
-
-                }
-                
-            } catch let error as NSError {
-                self.displayOneButtonAlert("Alert", message: "Unable to delete existing photos")
-                print(error)
-            }
-        }
-    }
-
 
 
     // ******************************************************
@@ -209,35 +166,27 @@ class PinDetailViewController: UIViewController {
     @IBAction func getNewCollection() {
         print("Get New Collection Called")
 
-        deletePhotos()
+        deletePhotos { 
+            self.getCollection({ (photoArray) in
+                print("collection returned")
+            })
+        }
 
-//        getCollection { (photoArray) in
-//            self.changeExisitingPhotos(photoArray)
-//        }
     }
 
     func getCollection(completion: (photoArray: [[String: AnyObject]]) -> Void) {
-        FlickrClient.sharedInstance.getPhotosForPin(longitude: String(pin.coordinates.longitude), latitude: String(pin.coordinates.latitude), pin: pin) { (result, error) in
+        FlickrClient.sharedInstance.getPhotosForPin(longitude: String(pin.coordinates.longitude), latitude: String(pin.coordinates.latitude), pin: pin) { (error) in
 
             guard error == nil else {
                 self.displayOneButtonAlert("Alert", message: error)
                 return
             }
 
-            guard let photoArray = result as? [[String: AnyObject]] else {
-                self.displayOneButtonAlert("Aleft", message: "No Data Returned")
-                return
-            }
-
-            print("PhotoArray: \(photoArray)")
-
-            completion(photoArray: photoArray)
-
         }
 
     }
 
-    func deletePhotos() {
+    func deletePhotos(completion: () -> Void) {
 
         let request = NSFetchRequest(entityName: Model.photo)
         let predicate = NSPredicate(format: "pin = %@", argumentArray: [pin])
@@ -258,6 +207,8 @@ class PinDetailViewController: UIViewController {
 
         }
 
+        completion()
+
     }
 
 }
@@ -274,11 +225,11 @@ extension PinDetailViewController: UICollectionViewDataSource {
 
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
 
-        guard let items = pin.photos?.count else {
+        guard let fetchedResultsController = fetchedResultsController else {
             return 0
         }
 
-        return items
+        return fetchedResultsController.sections![section].numberOfObjects
     }
 
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
@@ -304,7 +255,11 @@ extension PinDetailViewController: UICollectionViewDataSource {
 
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
 
-        let cell = collectionView.cellForItemAtIndexPath(indexPath) as! FlickrDetailViewCell
+        print("Delete")
+
+        guard let cell = collectionView.cellForItemAtIndexPath(indexPath) as? FlickrDetailViewCell else {
+            return
+        }
 
         fetchedResultsController?.managedObjectContext.deleteObject(cell.photo)
 
@@ -365,7 +320,8 @@ extension PinDetailViewController: NSFetchedResultsControllerDelegate {
             blockOperations.append(block)
 
         case .Delete:
-            let block = NSBlockOperation(block: { 
+            let block = NSBlockOperation(block: {
+                print("Deleting")
                 self.collectionView.deleteItemsAtIndexPaths([indexPath])
             })
 

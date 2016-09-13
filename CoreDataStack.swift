@@ -18,7 +18,7 @@ struct CoreDataStack {
     private let storeCoordinator: NSPersistentStoreCoordinator
 
     private let persistentContext: NSManagedObjectContext
-    private let backgroundContext: NSManagedObjectContext
+    let backgroundContext: NSManagedObjectContext
     let mainContext: NSManagedObjectContext
 
     private let modelURL: NSURL
