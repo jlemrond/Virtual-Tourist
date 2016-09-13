@@ -40,18 +40,18 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gMr-Fs-cmu">
                                 <rect key="frame" x="20" y="536" width="560" height="44"/>
                                 <subviews>
-                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="SELECT PINS TO DELETE" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="c18-yP-uJN">
-                                        <rect key="frame" x="195.5" y="13.5" width="169" height="17"/>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="SELECT PINS TO DELETE" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9Fe-uA-mFw">
+                                        <rect key="frame" x="183" y="11" width="195" height="21"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                        <textInputTraits key="textInputTraits"/>
-                                    </textField>
+                                        <nil key="highlightedColor"/>
+                                    </label>
                                 </subviews>
                                 <color key="backgroundColor" red="0.86274509799999999" green="0.34905338959591264" blue="0.35583708044768281" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
-                                    <constraint firstItem="c18-yP-uJN" firstAttribute="centerX" secondItem="gMr-Fs-cmu" secondAttribute="centerX" id="025-nD-DJs"/>
+                                    <constraint firstItem="9Fe-uA-mFw" firstAttribute="centerY" secondItem="gMr-Fs-cmu" secondAttribute="centerY" id="3qX-7N-UCP"/>
+                                    <constraint firstItem="9Fe-uA-mFw" firstAttribute="centerX" secondItem="gMr-Fs-cmu" secondAttribute="centerX" id="66f-W6-eej"/>
                                     <constraint firstAttribute="height" constant="44" id="Hto-us-YRR"/>
-                                    <constraint firstItem="c18-yP-uJN" firstAttribute="centerY" secondItem="gMr-Fs-cmu" secondAttribute="centerY" id="ke4-dh-pVT"/>
                                 </constraints>
                             </view>
                         </subviews>
@@ -118,9 +118,6 @@
                                             <rect key="frame" x="0.0" y="0.0" width="215" height="215"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="bbl-Ra-2yt">
-                                                    <rect key="frame" x="0.0" y="0.0" width="215" height="215"/>
-                                                </imageView>
                                                 <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="NZD-bf-3iG">
                                                     <rect key="frame" x="63" y="63" width="88" height="88"/>
                                                     <constraints>
@@ -128,6 +125,9 @@
                                                         <constraint firstAttribute="height" constant="88" id="hhq-B2-yX2"/>
                                                     </constraints>
                                                 </activityIndicatorView>
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="bbl-Ra-2yt">
+                                                    <rect key="frame" x="0.0" y="0.0" width="215" height="215"/>
+                                                </imageView>
                                             </subviews>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </view>
@@ -146,6 +146,12 @@
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="No Images to Display" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8ef-Yx-q9h">
+                                <rect key="frame" x="219" y="290" width="162" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                             <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="oWF-Z7-Vn7">
                                 <rect key="frame" x="0.0" y="512" width="600" height="44"/>
                                 <constraints>
@@ -153,7 +159,7 @@
                                 </constraints>
                                 <items>
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="ykj-kk-e5w"/>
-                                    <barButtonItem title="New Photos Collection" id="BB1-Fw-vlH">
+                                    <barButtonItem enabled="NO" title="New Photos Collection" id="BB1-Fw-vlH">
                                         <connections>
                                             <action selector="getNewCollection" destination="rg3-IG-By0" id="HLY-mG-ZDJ"/>
                                         </connections>
@@ -168,7 +174,9 @@
                             <constraint firstAttribute="trailingMargin" secondItem="g1h-d7-a7W" secondAttribute="trailing" constant="-20" id="CPR-hN-Kaa"/>
                             <constraint firstItem="wb7-WV-lZC" firstAttribute="top" secondItem="oWF-Z7-Vn7" secondAttribute="bottom" id="GEF-om-zwJ"/>
                             <constraint firstAttribute="trailingMargin" secondItem="xjd-N4-A7v" secondAttribute="trailing" constant="-20" id="HiB-7J-iq7"/>
+                            <constraint firstItem="8ef-Yx-q9h" firstAttribute="centerX" secondItem="He6-5C-gX8" secondAttribute="centerX" id="KPR-BF-3gY"/>
                             <constraint firstItem="wb7-WV-lZC" firstAttribute="top" secondItem="g1h-d7-a7W" secondAttribute="bottom" constant="44" id="NKc-io-s0k"/>
+                            <constraint firstItem="8ef-Yx-q9h" firstAttribute="centerY" secondItem="He6-5C-gX8" secondAttribute="centerY" id="dWa-9U-1ft"/>
                             <constraint firstItem="g1h-d7-a7W" firstAttribute="top" secondItem="xjd-N4-A7v" secondAttribute="bottom" id="doO-B9-efk"/>
                             <constraint firstItem="g1h-d7-a7W" firstAttribute="leading" secondItem="He6-5C-gX8" secondAttribute="leadingMargin" constant="-20" id="oDu-qK-gP7"/>
                             <constraint firstItem="xjd-N4-A7v" firstAttribute="leading" secondItem="He6-5C-gX8" secondAttribute="leadingMargin" constant="-20" id="rNj-P8-322"/>
@@ -181,6 +189,8 @@
                     <connections>
                         <outlet property="collectionView" destination="g1h-d7-a7W" id="mzW-SK-HAi"/>
                         <outlet property="mapView" destination="xjd-N4-A7v" id="oPh-Ws-Yns"/>
+                        <outlet property="newCollectionButton" destination="BB1-Fw-vlH" id="qV0-3C-J4r"/>
+                        <outlet property="noImagesLabel" destination="8ef-Yx-q9h" id="IU2-Mj-q4C"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="mXf-L8-R6K" userLabel="First Responder" sceneMemberID="firstResponder"/>

@@ -32,7 +32,25 @@ class MapViewController: UIViewController {
     // ******************************************************
 
     override func viewDidLoad() {
-        print("Map View Loaded")
+
+        // Set MapView region.
+        if NSUserDefaults.standardUserDefaults().boolForKey("RegionEstablished") {
+            print("Region is set")
+
+            let longitude = NSUserDefaults.standardUserDefaults().doubleForKey("Longitude")
+            let latitude = NSUserDefaults.standardUserDefaults().doubleForKey("Latitude")
+            let longitudeDelta = NSUserDefaults.standardUserDefaults().doubleForKey("LongitudeDelta")
+            let latitudeDelta = NSUserDefaults.standardUserDefaults().doubleForKey("LatitudeDelta")
+
+            let center = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+            let span = MKCoordinateSpan(latitudeDelta: latitudeDelta, longitudeDelta: longitudeDelta)
+            let region = MKCoordinateRegion(center: center, span: span)
+            mapView.setRegion(region, animated: true)
+
+        } else {
+            print("Not Set")
+            setUserDefaultsForMap()
+        }
 
         // Set Delegate.
         mapView.delegate = self
@@ -201,6 +219,22 @@ class MapViewController: UIViewController {
         }
     }
 
+    /// Store user location on Map.
+    func setUserDefaultsForMap() {
+        let region = mapView.region
+        let longitude = region.center.longitude
+        let latitude = region.center.latitude
+        let longitudeDelta = region.span.longitudeDelta
+        let latitudeDelta = region.span.latitudeDelta
+
+        NSUserDefaults.standardUserDefaults().setDouble(longitude, forKey: "Longitude")
+        NSUserDefaults.standardUserDefaults().setDouble(latitude, forKey: "Latitude")
+        NSUserDefaults.standardUserDefaults().setDouble(longitudeDelta, forKey: "LongitudeDelta")
+        NSUserDefaults.standardUserDefaults().setDouble(latitudeDelta, forKey: "LatitudeDelta")
+
+        NSUserDefaults.standardUserDefaults().setBool(true, forKey: "RegionEstablished")
+    }
+
 }
 
 
@@ -218,15 +252,17 @@ extension MapViewController: MKMapViewDelegate {
     /// that pin will be pushed on the stack and presented.
     func mapView(mapView: MKMapView, didSelectAnnotationView view: MKAnnotationView) {
 
-        guard editable == false else {
-            performOnMain({ 
-                self.mapView.removeAnnotation(view.annotation!)
-                // TODO: Delete from Database.
-            })
+        guard let annotation = view.annotation as? TravelLocationPointAnnotation else {
             return
         }
 
-        guard let annotation = view.annotation as? TravelLocationPointAnnotation else {
+        guard editable == false else {
+            performOnMain({
+                self.mapView.removeAnnotation(view.annotation!)
+            })
+            self.stack.performBackgroundBatchOperation({ (context) in
+                context.deleteObject(annotation.pin)
+            })
             return
         }
 
@@ -236,9 +272,16 @@ extension MapViewController: MKMapViewDelegate {
         }
 
         pinDetailViewController.pin = annotation.pin
-        pinDetailViewController.photoArray = annotation.pin.photos
         navigationController?.pushViewController(pinDetailViewController, animated: true)
 
+    }
+
+    func mapViewDidFinishLoadingMap(mapView: MKMapView) {
+        setUserDefaultsForMap()
+    }
+
+    func mapView(mapView: MKMapView, regionWillChangeAnimated animated: Bool) {
+        setUserDefaultsForMap()
     }
 
 

@@ -13,8 +13,6 @@ import MapKit
 
 class Pin: NSManagedObject {
 
-// Insert code here to add functionality to your managed object subclass
-
     convenience init?(coordinates: CLLocationCoordinate2D, context: NSManagedObjectContext) {
 
         guard let entity = NSEntityDescription.entityForName(Model.pin, inManagedObjectContext: context) else {

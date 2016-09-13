@@ -19,11 +19,14 @@ class PinDetailViewController: UIViewController {
 
     @IBOutlet var mapView: MKMapView!
     @IBOutlet var collectionView: UICollectionView!
+    @IBOutlet var noImagesLabel: UILabel!
+    @IBOutlet var newCollectionButton: UIBarButtonItem!
 
     var pin: Pin!
     var stack: CoreDataStack!
     var photoArray: NSSet?
     var blockOperations: [NSBlockOperation] = []
+
 
     var fetchedResultsController: NSFetchedResultsController? {
         didSet {
@@ -40,7 +43,6 @@ class PinDetailViewController: UIViewController {
     // ******************************************************
 
     override func viewDidLoad() {
-        //print("View for \(pin) loaded")
 
         setUpMapView()
 
@@ -48,6 +50,8 @@ class PinDetailViewController: UIViewController {
         collectionView.dataSource = self
 
         createFetchResultsController()
+
+        noImagesLabel.hidden = true
 
     }
 
@@ -74,11 +78,17 @@ class PinDetailViewController: UIViewController {
 
     /// Get the images from the photoSet within the fetched Resulsts Controller.  Uses
     /// the URL attached to the photo to return an NSData object to create the images.
-    func getImages() {
+    func getImages(completion: () -> Void) {
 
         guard let photoSet = fetchedResultsController?.fetchedObjects as? [Photo] else {
             print("No set of photos")
             return
+        }
+
+        if photoSet.count == 0 {
+            performOnMain({ 
+                self.noImagesLabel.hidden = false
+            })
         }
 
         for photo in photoSet {
@@ -112,6 +122,8 @@ class PinDetailViewController: UIViewController {
                 })
             })
         }
+
+        completion()
     }
 
 
@@ -142,7 +154,11 @@ class PinDetailViewController: UIViewController {
         do {
             try fetchedResultsController!.performFetch()
 
-            getImages()
+            getImages({ 
+                performOnMain({
+                    self.newCollectionButton.enabled = true
+                })
+            })
 
         } catch let error as NSError {
             displayOneButtonAlert("Alert", message: error.localizedDescription)
@@ -159,6 +175,8 @@ class PinDetailViewController: UIViewController {
     /// another API Call to get a refresh on the photos from Flickr.
     @IBAction func getNewCollection() {
         print("Get New Collection Called")
+
+        newCollectionButton.enabled = false
 
         stack.performBackgroundBatchOperation { (context) in
             self.deletePhotos {

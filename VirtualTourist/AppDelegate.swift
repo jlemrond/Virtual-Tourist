@@ -17,6 +17,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     let stack = CoreDataStack(model: "Model")!
 
 
+    func checkIfFirstLaunch() {
+
+        if !NSUserDefaults.standardUserDefaults().boolForKey("HasLaunchedBefore") {
+            print("First Launch")
+            NSUserDefaults.standardUserDefaults().setBool(true, forKey: "HasLaunchedBefore")
+            let coordinates = CLLocationCoordinate2D(latitude: Double(30), longitude: Double(-40))
+            let span = MKCoordinateSpan(latitudeDelta: 117.7, longitudeDelta: 179.9)
+            let region = MKCoordinateRegion(center: coordinates, span: span) as? AnyObject
+            NSUserDefaults.standardUserDefaults().setObject(region, forKey: "MapViewRegion")
+        }
+    }
+
+
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         stack.autoSave(10)
         return true
