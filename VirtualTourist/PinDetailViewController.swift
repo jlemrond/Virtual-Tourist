@@ -26,6 +26,7 @@ class PinDetailViewController: UIViewController {
     var stack: CoreDataStack!
     var photoArray: NSSet?
     var blockOperations: [NSBlockOperation] = []
+    var page: Int!
 
 
     var fetchedResultsController: NSFetchedResultsController? {
@@ -43,6 +44,8 @@ class PinDetailViewController: UIViewController {
     // ******************************************************
 
     override func viewDidLoad() {
+
+        page = 1
 
         setUpMapView()
 
@@ -68,11 +71,11 @@ class PinDetailViewController: UIViewController {
     /// Set up map at the top of view to display the location of the pin and the
     /// surrounding area.
     func setUpMapView() {
-        let region = MKCoordinateRegionMakeWithDistance(pin.coordinates, 1500, 1500)
+        let region = MKCoordinateRegionMakeWithDistance(pin.coordinates!, 1500, 1500)
         mapView.setRegion(region, animated: true)
 
         let annotation = MKPointAnnotation()
-        annotation.coordinate = pin.coordinates
+        annotation.coordinate = pin.coordinates!
         mapView.addAnnotation(annotation)
     }
 
@@ -80,30 +83,30 @@ class PinDetailViewController: UIViewController {
     /// the URL attached to the photo to return an NSData object to create the images.
     func getImages(completion: () -> Void) {
 
-        guard let photoSet = fetchedResultsController?.fetchedObjects as? [Photo] else {
-            print("No set of photos")
-            return
-        }
-
-        if photoSet.count == 0 {
-            performOnMain({ 
-                self.noImagesLabel.hidden = false
-            })
-        }
-
-        for photo in photoSet {
-
-            guard let indexPath = fetchedResultsController?.indexPathForObject(photo) else {
-                print("Unable to locate object")
+        stack.performBackgroundBatchOperation { (context) in
+            guard let photoSet = self.fetchedResultsController?.fetchedObjects as? [Photo] else {
+                print("No set of photos")
                 return
             }
 
-            if photo.image != nil {
-                print("Photo already available")
-                continue
+            if photoSet.count == 0 {
+                performOnMain({
+                    self.noImagesLabel.hidden = false
+                })
             }
 
-            performHighPriority(action: { 
+            for photo in photoSet {
+
+                guard let indexPath = self.fetchedResultsController?.indexPathForObject(photo) else {
+                    print("Unable to locate object")
+                    return
+                }
+
+                if photo.image != nil {
+                    print("Photo already available")
+                    continue
+                }
+
                 FlickrClient.sharedInstance.getImageFromURL(String(photo.url!), completionHandler: { (result, error) in
                     guard error == nil else {
                         print("Error getting image: \(error)")
@@ -120,10 +123,10 @@ class PinDetailViewController: UIViewController {
                         photo.image = imageData
                     })
                 })
-            })
+            }
+            
+            completion()
         }
-
-        completion()
     }
 
 
@@ -196,39 +199,42 @@ class PinDetailViewController: UIViewController {
 
     /// Makes a call to the Flickr API to get photos based on the pin location.
     func getCollection(completion: () -> Void) {
-        FlickrClient.sharedInstance.getPhotosForPin(longitude: String(pin.coordinates.longitude), latitude: String(pin.coordinates.latitude), pin: pin) { (result, error) in
+        stack.performBackgroundBatchOperation { (context) in
+            FlickrClient.sharedInstance.getPhotosForPin(longitude: String(self.pin.coordinates!.longitude), latitude: String(self.pin.coordinates!.latitude), pin: self.pin, page: self.page) { (result, error) in
 
-            guard error == nil else {
-                self.displayOneButtonAlert("Alert", message: error)
-                return
-            }
-
-            guard let photoArray = result as? [[String: AnyObject]] else {
-                self.displayOneButtonAlert("Alert", message: "No photos returned")
-                return
-            }
-
-            for (index, value) in photoArray.enumerate() {
-
-                guard let id = value["id"] as? String else {
-                    print("No ID")
-                    continue
+                guard error == nil else {
+                    self.displayOneButtonAlert("Alert", message: error)
+                    return
                 }
 
-                guard let url = value["url_z"] as? String else {
-                    print("No URL Available")
-                    continue
+                guard let photoArray = result as? [[String: AnyObject]] else {
+                    self.displayOneButtonAlert("Alert", message: "No photos returned")
+                    return
                 }
 
-                let newPhoto = Photo(index: index, url: url, id: Int(id)!, context: self.stack.backgroundContext)
-                newPhoto!.pin = self.pin
+                for (index, value) in photoArray.enumerate() {
 
+                    guard let id = value["id"] as? String else {
+                        print("No ID")
+                        continue
+                    }
+
+                    guard let url = value["url_z"] as? String else {
+                        print("No URL Available")
+                        continue
+                    }
+
+                    let newPhoto = Photo(index: index, url: url, id: Int(id)!, context: self.stack.backgroundContext)
+                    newPhoto!.pin = self.pin
+                    
+                }
+
+                self.page = self.page + 1
+                
+                completion()
+                
             }
-
-            completion()
-
         }
-
     }
 
     /// Deletes the current photos in the collection view.
@@ -280,13 +286,12 @@ extension PinDetailViewController: UICollectionViewDataSource {
         cell.photo = photo
         cell.backgroundColor = UIColor.whiteColor()
 
-        guard let imageData = photo?.image else {
-            cell.loadingIndicator.startAnimating()
-            return cell
+        if let imageData = photo?.image {
+                cell.cellImage.image = UIImage(data: imageData)
+                cell.loadingIndicator.stopAnimating()
+        } else {
+                cell.loadingIndicator.startAnimating()
         }
-
-        cell.loadingIndicator.stopAnimating()
-        cell.cellImage.image = UIImage(data: imageData)
 
         return cell
 

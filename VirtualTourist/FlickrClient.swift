@@ -33,9 +33,9 @@ class FlickrClient: Networkable {
     // ******************************************************
 
     /// Get Photos from Flickr when a pin is dropped.
-    func getPhotosForPin(longitude longitude: String, latitude: String, pin: Pin, completionHandler: (result: AnyObject?, error: String?) -> Void) {
+    func getPhotosForPin(longitude longitude: String, latitude: String, pin: Pin, page: Int?, completionHandler: (result: AnyObject?, error: String?) -> Void) {
 
-        let url = buildFlickrAPIURL(longitude: longitude, latitude: latitude)
+        let url = buildFlickrAPIURL(longitude: longitude, latitude: latitude, page: page)
 
         let request = NSMutableURLRequest(URL: url)
 
@@ -99,9 +99,9 @@ class FlickrClient: Networkable {
     }
 
 
-    func buildFlickrAPIURL(longitude longitude: String, latitude: String) -> NSURL {
+    func buildFlickrAPIURL(longitude longitude: String, latitude: String, page: Int?) -> NSURL {
 
-        let quereyItems: [NSURLQueryItem] = [
+        var quereyItems: [NSURLQueryItem] = [
             NSURLQueryItem(name: QueryKeys.method, value: QueryValues.method),
             NSURLQueryItem(name: QueryKeys.apiKey, value: QueryValues.APIKey),
             NSURLQueryItem(name: QueryKeys.latitude, value: latitude),
@@ -110,6 +110,10 @@ class FlickrClient: Networkable {
             NSURLQueryItem(name: QueryKeys.extras, value: QueryValues.url),
             NSURLQueryItem(name: QueryKeys.format, value: QueryValues.format)
         ]
+
+        if let page = page {
+            quereyItems.append(NSURLQueryItem(name: "page", value: String(page)))
+        }
 
         let components = NSURLComponents()
         components.scheme = URL.scheme

@@ -142,7 +142,7 @@ class MapViewController: UIViewController {
     /// Get Data from Flickr for each annotation.  Including URLs for photos in the area.
     func getDataForAnnotation(pin pin: Pin) {
 
-        FlickrClient.sharedInstance.getPhotosForPin(longitude: String(pin.coordinates.longitude), latitude: String(pin.coordinates.latitude), pin: pin, completionHandler: { (result, error) in
+        FlickrClient.sharedInstance.getPhotosForPin(longitude: String(pin.coordinates!.longitude), latitude: String(pin.coordinates!.latitude), pin: pin, page: nil, completionHandler: { (result, error) in
 
             guard error == nil else {
                 self.displayOneButtonAlert("Alert", message: error)
@@ -188,28 +188,30 @@ class MapViewController: UIViewController {
         let fetchRequest = NSFetchRequest()
         fetchRequest.entity = NSEntityDescription.entityForName(Model.pin, inManagedObjectContext: stack.backgroundContext)
 
-        var results: [Pin]
-        do {
-            results = try stack.backgroundContext.executeFetchRequest(fetchRequest) as! [Pin]
-        } catch {
-            let fetchError = error as NSError
-            print(fetchError)
-            return
-        }
-
-        for item in results {
-
-            guard let latitude = item.latitude,
-                let longitude = item.longitude else {
-                    continue
+        stack.performBackgroundBatchOperation { (context) in
+            var results: [Pin]
+            do {
+                results = try stack.backgroundContext.executeFetchRequest(fetchRequest) as! [Pin]
+            } catch {
+                let fetchError = error as NSError
+                print(fetchError)
+                return
             }
 
-            let annotation = TravelLocationPointAnnotation(pin: item)
-            annotation.coordinate = CLLocationCoordinate2D(latitude: Double(latitude), longitude: Double(longitude))
-            mapView.addAnnotation(annotation)
+            for item in results {
 
+                guard let latitude = item.latitude,
+                    let longitude = item.longitude else {
+                        continue
+                }
+
+                let annotation = TravelLocationPointAnnotation(pin: item)
+                annotation.coordinate = CLLocationCoordinate2D(latitude: Double(latitude), longitude: Double(longitude))
+                performOnMain({ 
+                    self.mapView.addAnnotation(annotation)
+                })
+            }
         }
-
     }
 
     /// Check for selected annotations and deselect them.
@@ -270,6 +272,8 @@ extension MapViewController: MKMapViewDelegate {
             displayOneButtonAlert("Alert", message: "Unable to display detail view")
             return
         }
+
+        deselectAnnotations()
 
         pinDetailViewController.pin = annotation.pin
         navigationController?.pushViewController(pinDetailViewController, animated: true)

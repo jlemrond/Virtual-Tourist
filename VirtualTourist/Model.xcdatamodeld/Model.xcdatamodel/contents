@@ -16,6 +16,6 @@
     </entity>
     <elements>
         <element name="Photo" positionX="-54" positionY="-48" width="128" height="120"/>
-        <element name="Pin" positionX="-308" positionY="-48" width="128" height="118"/>
+        <element name="Pin" positionX="-308" positionY="-48" width="128" height="120"/>
     </elements>
 </model>
